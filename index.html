@@ -2,37 +2,616 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NetMatrix — Intranet FRC 2026.1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0a0e17;
+      --bg2:      #111827;
+      --bg3:      #1a2235;
+      --border:   #1e2d45;
+      --accent:   #00d4ff;
+      --accent2:  #7c3aed;
+      --green:    #10b981;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --mono:     'IBM Plex Mono', monospace;
+      --sans:     'Inter', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* ── GRID SCAN LINES (signature element) ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 56px;
+      background: rgba(10,14,23,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: var(--mono);
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+    }
+
+    .nav-logo span { color: var(--muted); }
+
+    nav ul {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    nav a {
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+      font-family: var(--mono);
+      transition: color 0.2s;
+    }
+
+    nav a:hover { color: var(--accent); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      padding: 6rem 2rem 5rem;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 32px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    h1 {
+      font-family: var(--mono);
+      font-size: clamp(2.8rem, 7vw, 5rem);
+      font-weight: 600;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: #fff;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 .accent { color: var(--accent); }
+
+    .hero-desc {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 560px;
+      margin-bottom: 2.5rem;
+      line-height: 1.8;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .badge {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 0.3rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--muted);
+      background: var(--bg2);
+    }
+
+    .badge.green { border-color: var(--green); color: var(--green); }
+    .badge.blue  { border-color: var(--accent); color: var(--accent); }
+
+    /* ── SECTIONS ── */
+    section {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── NETWORK GRID ── */
+    .network-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .net-card {
+      background: var(--bg2);
+      padding: 1.25rem 1.5rem;
+      transition: background 0.2s;
+    }
+
+    .net-card:hover { background: var(--bg3); }
+
+    .net-card-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    .net-card-value {
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .net-card-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 0.2rem;
+    }
+
+    /* ── SERVICES ── */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+
+    .service-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      transition: border-color 0.2s, background 0.2s;
+      cursor: default;
+    }
+
+    .service-card:hover {
+      border-color: var(--accent);
+      background: var(--bg3);
+    }
+
+    .service-icon {
+      font-family: var(--mono);
+      font-size: 20px;
+      margin-bottom: 0.75rem;
+    }
+
+    .service-name {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.25rem;
+    }
+
+    .service-ip {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .service-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .service-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 1rem;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--green);
+    }
+
+    .service-status::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ── TEAM ── */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .member-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      transition: border-color 0.2s;
+    }
+
+    .member-card:hover { border-color: var(--accent2); }
+
+    .member-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-weight: 600;
+      font-size: 14px;
+      color: #fff;
+      margin-bottom: 1rem;
+    }
+
+    .member-name {
+      font-weight: 600;
+      font-size: 14px;
+      color: #fff;
+      margin-bottom: 0.25rem;
+    }
+
+    .member-role {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .member-email {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .member-link {
+      display: inline-block;
+      margin-top: 1rem;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent2);
+      text-decoration: none;
+      border: 1px solid var(--accent2);
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .member-link:hover { background: rgba(124,58,237,0.15); }
+
+    /* ── QUESTÕES ── */
+    .questoes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .questao-link {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      text-decoration: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .questao-link:hover {
+      border-color: var(--accent);
+      background: var(--bg3);
+    }
+
+    .questao-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      min-width: 28px;
+    }
+
+    .questao-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: #fff;
+    }
+
+    .questao-arrow {
+      margin-left: auto;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    footer span { color: var(--accent); }
+
+    @media (max-width: 600px) {
+      nav ul { display: none; }
+      h1 { font-size: 2.5rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .service-status::before { animation: none; }
+    }
+  </style>
 </head>
 <body>
-  <h1>NetMatrix</h1>
-  <p>Trabalho prático — Fundamentos de Redes de Computadores | UnB/FCTE 2026.1</p>
 
-  <h2>Dados da rede</h2>
-  <ul>
-    <li>Domínio: <strong>netmatrix.com.br</strong></li>
-    <li>Endereçamento: <strong>192.168.10.0/24</strong></li>
-    <li>IPs dinâmicos (DHCP): <strong>192.168.10.100 – 192.168.10.200</strong></li>
-    <li>DNS: <strong>192.168.10.10</strong></li>
-    <li>SMTP/POP3: <strong>192.168.10.20</strong></li>
-    <li>WWW: <strong>192.168.10.30</strong></li>
-    <li>DHCP/Roteador: <strong>192.168.10.1</strong></li>
-  </ul>
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">Net<span>/</span>Matrix</div>
+    <ul>
+      <li><a href="#rede">Rede</a></li>
+      <li><a href="#servicos">Serviços</a></li>
+      <li><a href="#equipe">Equipe</a></li>
+      <li><a href="#questoes">Questões</a></li>
+    </ul>
+  </nav>
 
-  <h2>Membros</h2>
-  <ul>
-    <li><a href="http://antonio.netmatrix.com.br">Antonio Carvalho</a> — antonio.carvalho@netmatrix.com.br</li>
-    <li><a href="http://luana.netmatrix.com.br">Luana Ribeiro</a> — luana.ribeiro@netmatrix.com.br</li>
-    <li><a href="http://cristiano.netmatrix.com.br">Cristiano Morais</a> — cristiano.morais@netmatrix.com.br</li>
-    <li><a href="http://maykon.netmatrix.com.br">Maykon [Sobrenome]</a> — maykon@netmatrix.com.br</li>
-  </ul>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">FRC 2026.1 — UnB/FCTE — Prof. Fernando W. Cruz</div>
+    <h1>Net<span class="accent">Matrix</span></h1>
+    <p class="hero-desc">
+      Intranet corporativa fictícia com os quatro serviços básicos de rede configurados em ambiente Linux/Ubuntu — DHCP, DNS, SMTP e WWW — simulando a infraestrutura de uma empresa real.
+    </p>
+    <div class="hero-badges">
+      <span class="badge blue">netmatrix.com.br</span>
+      <span class="badge green">● online</span>
+      <span class="badge">Ubuntu Server 22.04</span>
+      <span class="badge">192.168.10.0/24</span>
+      <span class="badge">Classe C</span>
+    </div>
+  </div>
 
-  <h2>Respostas dos roteiros</h2>
-  <ul>
-    <li><a href="dhcp.html">Questões DHCP</a></li>
-    <li><a href="dns.html">Questões DNS</a></li>
-    <li><a href="smtp.html">Questões SMTP</a></li>
-    <li><a href="www.html">Questões WWW</a></li>
-  </ul>
+  <!-- REDE -->
+  <section id="rede">
+    <div class="section-label">Configuração de rede</div>
+    <div class="network-grid">
+      <div class="net-card">
+        <div class="net-card-label">Domínio</div>
+        <div class="net-card-value">netmatrix.com.br</div>
+      </div>
+      <div class="net-card">
+        <div class="net-card-label">Rede</div>
+        <div class="net-card-value">192.168.10.0/24</div>
+        <div class="net-card-sub">Máscara 255.255.255.0</div>
+      </div>
+      <div class="net-card">
+        <div class="net-card-label">Gateway / DHCP</div>
+        <div class="net-card-value">192.168.10.1</div>
+      </div>
+      <div class="net-card">
+        <div class="net-card-label">IPs dinâmicos</div>
+        <div class="net-card-value">.100 – .200</div>
+        <div class="net-card-sub">Faixa DHCP</div>
+      </div>
+      <div class="net-card">
+        <div class="net-card-label">DNS</div>
+        <div class="net-card-value">192.168.10.10</div>
+        <div class="net-card-sub">BIND9</div>
+      </div>
+      <div class="net-card">
+        <div class="net-card-label">SMTP / POP3</div>
+        <div class="net-card-value">192.168.10.20</div>
+        <div class="net-card-sub">Postfix + Dovecot</div>
+      </div>
+      <div class="net-card">
+        <div class="net-card-label">WWW</div>
+        <div class="net-card-value">192.168.10.30</div>
+        <div class="net-card-sub">Apache2</div>
+      </div>
+      <div class="net-card">
+        <div class="net-card-label">Broadcast</div>
+        <div class="net-card-value">192.168.10.255</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVIÇOS -->
+  <section id="servicos">
+    <div class="section-label">Serviços implementados</div>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">⬡</div>
+        <div class="service-name">DHCP</div>
+        <div class="service-ip">192.168.10.1</div>
+        <div class="service-desc">Atribuição dinâmica de IPs via isc-dhcp-server. Suporta reserva por endereço MAC.</div>
+        <div class="service-status">configurado</div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">◈</div>
+        <div class="service-name">DNS</div>
+        <div class="service-ip">192.168.10.10</div>
+        <div class="service-desc">Resolução de nomes com BIND9. Zonas direta e reversa, registros A e MX.</div>
+        <div class="service-status">configurado</div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">◎</div>
+        <div class="service-name">SMTP</div>
+        <div class="service-ip">192.168.10.20</div>
+        <div class="service-desc">Servidor de e-mail com Postfix. Acesso via POP3 pelo Dovecot.</div>
+        <div class="service-status">configurado</div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">▣</div>
+        <div class="service-name">WWW</div>
+        <div class="service-ip">192.168.10.30</div>
+        <div class="service-desc">Apache2 com virtual hosts por aluno, páginas pessoais e controle de acesso.</div>
+        <div class="service-status">online</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EQUIPE -->
+  <section id="equipe">
+    <div class="section-label">Equipe</div>
+    <div class="team-grid">
+      <div class="member-card">
+        <div class="member-avatar">LR</div>
+        <div class="member-name">Luana Ribeiro</div>
+        <div class="member-role">DHCP</div>
+        <div class="member-email">luana.ribeiro@netmatrix.com.br</div>
+        <a class="member-link" href="luana/index.html">ver relatório →</a>
+      </div>
+      <div class="member-card">
+        <div class="member-avatar">MS</div>
+        <div class="member-name">Maykon Soares</div>
+        <div class="member-role">DNS</div>
+        <div class="member-email">maykon.soares@netmatrix.com.br</div>
+        <a class="member-link" href="maykon/index.html">ver relatório →</a>
+      </div>
+      <div class="member-card">
+        <div class="member-avatar">CM</div>
+        <div class="member-name">Cristiano Morais</div>
+        <div class="member-role">SMTP</div>
+        <div class="member-email">cristiano.morais@netmatrix.com.br</div>
+        <a class="member-link" href="cristiano/index.html">ver relatório →</a>
+      </div>
+      <div class="member-card">
+        <div class="member-avatar">AC</div>
+        <div class="member-name">Antonio Carvalho</div>
+        <div class="member-role">WWW</div>
+        <div class="member-email">antonio.carvalho@netmatrix.com.br</div>
+        <a class="member-link" href="antonio/index.html">ver relatório →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUESTÕES -->
+  <section id="questoes">
+    <div class="section-label">Respostas dos roteiros</div>
+    <div class="questoes-grid">
+      <a class="questao-link" href="servicodhcp/docs/questoes.html">
+        <span class="questao-num">01</span>
+        <span class="questao-name">Questões DHCP</span>
+        <span class="questao-arrow">→</span>
+      </a>
+      <a class="questao-link" href="servicodns/docs/questoes.html">
+        <span class="questao-num">02</span>
+        <span class="questao-name">Questões DNS</span>
+        <span class="questao-arrow">→</span>
+      </a>
+      <a class="questao-link" href="servicosmtp/docs/questoes.html">
+        <span class="questao-num">03</span>
+        <span class="questao-name">Questões SMTP</span>
+        <span class="questao-arrow">→</span>
+      </a>
+      <a class="questao-link" href="servicowww/docs/questoes.html">
+        <span class="questao-num">04</span>
+        <span class="questao-name">Questões WWW</span>
+        <span class="questao-arrow">→</span>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <p>NetMatrix &mdash; FRC 2026.1 &mdash; UnB/FCTE &mdash; <span>netmatrix.com.br</span></p>
+  </footer>
+
 </body>
 </html>
