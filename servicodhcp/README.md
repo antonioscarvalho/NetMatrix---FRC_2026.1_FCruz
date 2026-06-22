@@ -1,14 +1,16 @@
 # DHCP — NetMatrix
 
-**Servidor:** `192.168.10.1`  
-**Software:** `isc-dhcp-server`  
-**Responsável:** [nome do membro]
+**Servidor:** `192.168.10.2`  
+**Software:** `kea` (`kea-dhcp4`)  
+**Responsável:** Maykon Soares
 
 ## Como subir o serviço
 
 ```bash
-sudo apt install isc-dhcp-server -y
-sudo cp config/dhcpd.conf /etc/dhcp/dhcpd.conf
-sudo systemctl restart isc-dhcp-server
-sudo systemctl status isc-dhcp-server
+sudo dnf install kea -y
+sudo cp config/kea-dhcp4.conf /etc/kea/kea-dhcp4.conf
+sudo systemctl restart kea-dhcp4
+sudo systemctl status kea-dhcp4
 ```
+
+> No roteiro original (Ubuntu/Debian) o equivalente é o `isc-dhcp-server` (`dhcpd3`), descontinuado no Fedora — ver `docs/relatorio.md` para os detalhes da adaptação.
