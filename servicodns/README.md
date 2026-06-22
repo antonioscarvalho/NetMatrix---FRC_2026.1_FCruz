@@ -2,7 +2,7 @@
 
 **Servidor:** `192.168.10.10`  
 **Software:** `bind9`  
-**Responsável:** [nome do membro]
+**Responsável:** Luana Ribeiro
 
 ## Como subir o serviço
 
