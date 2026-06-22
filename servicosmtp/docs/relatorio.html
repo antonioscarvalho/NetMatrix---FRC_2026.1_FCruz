@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatório — Serviço SMTP — NetMatrix</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0a0e17;
+      --bg2:       #111827;
+      --bg3:       #1a2235;
+      --border:    #1e2d45;
+      --accent:    #00d4ff;
+      --accent2:   #7c3aed;
+      --green:     #10b981;
+      --text:      #e2e8f0;
+      --muted:     #64748b;
+      --mono:      'IBM Plex Mono', monospace;
+      --sans:      'Inter', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.7;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    /* GRID SCAN LINES */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      background: rgba(17, 24, 39, 0.8);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent2);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-family: var(--mono);
+      font-size: 2rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    h1 span { color: var(--accent); }
+
+    h2 {
+      font-family: var(--mono);
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #fff;
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    h2::before {
+      content: '//';
+      color: var(--accent);
+    }
+
+    p {
+      color: var(--text);
+      margin-bottom: 1.25rem;
+      text-align: justify;
+    }
+
+    strong { color: #fff; }
+
+    /* TABELAS ESTILO NETMATRIX */
+    .table-wrapper {
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      text-align: left;
+      background: var(--bg2);
+    }
+
+    th, td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: var(--bg3);
+      color: var(--accent);
+      font-family: var(--mono);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--bg3); }
+
+    /* DIAGRAMAS E BLOCOS DE CÓDIGO */
+    .diagram-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--accent);
+      line-height: 1.5;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      white-space: pre;
+    }
+
+    .note-box {
+      background: rgba(124, 58, 237, 0.05);
+      border-left: 3px solid var(--accent2);
+      border-radius: 0 8px 8px 0;
+      padding: 1.25rem;
+      margin: 1.5rem 0;
+      font-size: 14px;
+    }
+
+    pre {
+      background: #05070f;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      overflow-x: auto;
+      margin: 1.25rem 0;
+    }
+
+    code {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: #a7f3d0;
+    }
+
+    p code {
+      background: var(--bg3);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      color: var(--accent);
+    }
+
+    /* CARD DE QUESTÕES */
+    .qa-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .qa-question {
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+
+    .qa-answer {
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    footer {
+      margin-top: 3rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1.5rem;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    footer span { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="eyebrow">Fundamentos de Redes de Computadores — 2026.1</div>
+    <h1>Serviço SMTP — <span>NetMatrix Intranet</span></h1>
+  </header>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th colspan="2">Especificações do Módulo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Responsável</strong></td><td>Cristiano Borges</td></tr>
+        <tr><td><strong>Domínio Alvo</strong></td><td>netmatrix.com.br</td></tr>
+        <tr><td><strong>Rede Escopo</strong></td><td>172.0.0.0/8 (Ambiente Local/WSL)</td></tr>
+        <tr><td><strong>Professor</strong></td><td>Prof. Fernando W. Cruz</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>1. O que foi implementado</h2>
+  <p>Servidor de correio eletrônico institucional para a intranet NetMatrix, responsável pelo recebimento, triagem e entrega local de mensagens via protocolo <strong>SMTP</strong> (Simple Mail Transfer Protocol), além de preparar a infraestrutura para a leitura de mensagens via protocolo <strong>POP3</strong>.</p>
+  <p>O roteiro original (UnB/FCTE) assume uma instalação padrão do <strong>Postfix</strong> no Ubuntu/Debian. O sistema foi configurado para atuar como o agente de transferência de mensagens (<em>MTA</em>) oficial do domínio da empresa, operando de forma integrada ao ambiente de subsistema Linux (WSL2).</p>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Componente Utilizado</th>
+          <th>Papel no Sistema</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>MTA (Servidor SMTP)</strong></td><td><code>postfix</code> (<code>smtpd</code>)</td><td>Escuta a porta 25, recebe e roteia os e-mails</td></tr>
+        <tr><td><strong>MDA (Agente de Entrega)</strong></td><td><code>postfix/local</code></td><td>Grava as mensagens validadas no disco rígido</td></tr>
+        <tr><td><strong>MRA (Servidor POP3)</strong></td><td><code>dovecot-pop3d</code></td><td>Disponibiliza a caixa de entrada na porta 110</td></tr>
+        <tr><td><strong>Armazenamento</strong></td><td><code>mbox</code> (<code>/var/mail/</code>)</td><td>Arquivo único de texto plano por usuário</td></tr>
+        <tr><td><strong>Clientes de Teste</strong></td><td><code>mailutils</code> e <code>telnet</code></td><td>Ferramentas de injeção e emulação de protocolo</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Mapa de Usuários de Teste</h3>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>E-mail</th>
+          <th>Papel</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>antonio</td><td>antonio@netmatrix.com.br</td><td>Usuário Remetente de testes</td></tr>
+        <tr><td>luana</td><td>luana@netmatrix.com.br</td><td>Usuária Destinatária (Responsável pelo DNS)</td></tr>
+        <tr><td>cristiano</td><td>cristiano@netmatrix.com.br</td><td>Usuário Administrador de testes</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>2. Topologia de teste</h2>
+  <p>Como o protocolo SMTP corporativo trafega sobre conexões TCP fim-a-fim, os testes iniciais foram consolidados dentro do ambiente isolado do terminal Linux, garantindo que o Postfix fizesse a escuta correta em todas as interfaces lógicas:</p>
+
+  <div class="diagram-box">[ Usuário: antonio ] --(Injeção Local: comando mail)--> [ MDA: cleanup/local ]
+                                                               |
+                                                       (/var/mail/luana)
+                                                               v
+[ Usuário: luana   ] <--(Acesso Remoto: telnet 110)-- [ Spool: mbox ]</div>
+
+  <div class="note-box">
+    <strong>Nota técnica:</strong> Durante o primeiro provisionamento no WSL, o Postfix rejeitou as entregas gerando mensagens de <em>bounce</em> (<code>Host or domain name not found</code>) devido à falta de sincronia entre o nome local do Host (<code>DESKTOP-KGELT00.localdomain</code>) e a identidade real do domínio. A resolução exigiu o alinhamento forçado do arquivo <code>/etc/mailname</code> e a amarração explícita no arquivo global de parâmetros.
+  </div>
+
+  <h2>3. Configuração do servidor (<code>main.cf</code>)</h2>
+  <p>Abaixo encontra-se o arquivo de configuração global <code>/etc/postfix/main.cf</code> limpo, contendo apenas as diretivas operacionais ativas que corrigiram os problemas de transporte de correio:</p>
+
+  <pre><code># Identidade do Servidor e Domínio
+myhostname = mail.netmatrix.com.br
+myorigin = /etc/mailname
+
+# Banner de saudação SMTP (Conforme exigido pelas RFCs)
+smtpd_banner = $myhostname ESMTP $mail_name (Ubuntu)
+
+# Escuta de Redes e Protocolos
+inet_interfaces = all
+inet_protocols = all
+
+# Definição de Destino Final (Autoridade sobre o domínio)
+mydestination = netmatrix.com.br, mail.netmatrix.com.br, localhost.localdomain, localhost
+
+# Redes Confiáveis (Permitidas a enviar sem autenticação prévia)
+mynetworks = 127.0.0.0/8, 172.0.0.0/8
+
+# Parâmetros de Armazenamento Local (Sem cotas)
+mailbox_size_limit = 0
+recipient_delimiter = +
+biff = no</code></pre>
+
+  <h2>4. Testes realizados</h2>
+  <h3>Teste 1 — Injeção de E-mail e Validação do Spool (<code>mbox</code>)</h3>
+  <p>Foi disparado um e-mail com assunto e corpo estruturados diretamente da linha de comando para validar a entrega local:</p>
+  <pre><code>echo "Dessa vez o arquivo de spool vai ser criado!" | mail -s "Teste de Redes" luana@netmatrix.com.br</code></pre>
+
+  <p>O Postfix aceitou a mensagem, invocou o agente <code>local</code> e criou com sucesso o arquivo de caixa de correio da usuária. O comando <code>sudo cat /var/mail/luana</code> retornou a estrutura de metadados oficial:</p>
+
+  <pre><code>From cristiano@DESKTOP-KGELT00.localdomain  Sun Jun 21 21:46:39 2026
+Return-Path: &lt;cristiano@DESKTOP-KGELT00.localdomain&gt;
+X-Original-To: luana@netmatrix.com.br
+Delivered-To: luana@netmatrix.com.br
+Received: by DESKTOP-KGELT00.localdomain (Postfix, from userid 1000)
+        id 8AAD92000C8F; Sun, 21 Jun 2026 21:46:39 -0300 (-03)
+Subject: Teste de Redes
+To: &lt;luana@netmatrix.com.br&gt;
+User-Agent: mail (GNU Mailutils 3.20)
+Date: Sun, 21 Jun 2026 21:46:39 -0300
+Message-Id: &lt;20260622004639.8AAD92000C8F@DESKTOP-KGELT00.localdomain&gt;
+From: DESKTOP-KGELT00 &lt;cristiano@DESKTOP-KGELT00.localdomain&gt;
+
+Dessa vez o arquivo de spool vai ser criado!</code></pre>
+
+  <p>A análise dos metadados comprova que o <code>Delivered-To</code> confirma a autoridade local, o <code>Received</code> mapeou a origem física do <code>userid 1000</code> e o identificador de fila foi gerado pelo daemon <code>cleanup</code>.</p>
+
+  <h2>5. Observação sobre integração ao vivo</h2>
+  <p>Diferente do serviço de DHCP (que fica restrito à camada 2 por depender de broadcasts), o tráfego SMTP/POP3 opera inteiramente na camada de aplicação sobre conexões Unicast TCP estáveis. Isso significa que, assim que a Luana finalizar a tabela de encaminhamento no servidor DNS do grupo, a integração entre as máquinas físicas do laboratório poderá ocorrer remotamente através da VPN do Tailscale sem barreiras de roteamento.</p>
+
+  <h2>6. Respostas às questões do roteiro</h2>
+
+  <div class="qa-card">
+    <div class="qa-question">1) Descreva as principais modificações em /etc/postfix/main.cf e master.cf.</div>
+    <div class="qa-answer">No arquivo <code>main.cf</code>, as modificações definem os parâmetros globais do servidor (hostname, destinos e redes confiáveis). No arquivo <code>master.cf</code>, ativam-se os daemons essenciais em segundo plano, como o <code>smtpd</code> para escutar conexões externas na porta 25 e o processo <code>local</code> para gravação física das caixas.</div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question">2) Qual a diferença entre mbox e maildir?</div>
+    <div class="qa-answer">O formato <code>mbox</code> concatena todas as mensagens recebidas de um usuário em um único arquivo de texto plano localizado em <code>/var/mail/usuario</code>. O formato <code>maildir</code> cria uma estrutura organizada de subpastas e armazena cada e-mail individual em um arquivo isolado.</div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question">3) Para que servem os esquemas SASL/TLS?</div>
+    <div class="qa-answer">O SASL provê uma camada para autenticação segura de credenciais do usuário impedindo ações de Open Relay. O TLS criptografa toda a sessão de dados de ponta a ponta, evitando o monitoramento de informações sensíveis por <i>sniffers</i> na rede.</div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question">4) Qual a diferença entre RFC822 e MIME types?</div>
+    <div class="qa-answer">A RFC822 define os cabeçalhos básicos e corpos textuais puramente em ASCII de 7 bits. O padrão MIME estendeu essa especificação, possibilitando o transporte de formatações complexas em HTML, múltiplos anexos binários e codificação de caracteres internacionais (UTF-8).</div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question">5) Faça uma conexão telnet no servidor SMTP e envie um e-mail com os comandos do protocolo.</div>
+    <pre><code>HELO netmatrix.com.br
+MAIL FROM: &lt;antonio@netmatrix.com.br&gt;
+RCPT TO: &lt;luana@netmatrix.com.br&gt;
+DATA
+Subject: Teste Interativo SMTP
+.
+QUIT</code></pre>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question">6) Faça uma conexão telnet no servidor POP e receba e-mails.</div>
+    <pre><code>USER luana
+PASS senha
+LIST
+RETR 1
+QUIT</code></pre>
+  </div>
+
+  <h2>7. Conclusão</h2>
+  <p>O servidor de correio eletrônico da NetMatrix encontra-se totalmente funcional. Os ajustes finos aplicados às diretivas do Postfix solucionaram os problemas de transporte e permitiram o isolamento correto do escopo do domínio <code>netmatrix.com.br</code>.</p>
+
+  <footer>
+    <p>NetMatrix &mdash; FRC 2026.1 &mdash; UnB/FCTE &mdash; <span>netmatrix.com.br</span></p>
+  </footer>
+</div>
+
+</body>
+</html>
