@@ -1,0 +1,23 @@
+$TTL    604800
+@       IN      SOA     ns1.netmatrix.com.br. admin.netmatrix.com.br. (
+                              2         ; Serial (incrementar a cada alteracao)
+                         604800         ; Refresh - intervalo p/ slaves verificarem o master
+                          86400         ; Retry   - intervalo entre tentativas se o refresh falhar
+                        2419200         ; Expire  - tempo p/ um slave desistir do master
+                         604800 )       ; Minimo  - TTL de respostas negativas (cache)
+;
+@       IN      NS      ns1.netmatrix.com.br.
+@       IN      MX      10 mail.netmatrix.com.br.
+
+; --- Infraestrutura da intranet ---
+ns1       IN      A       192.168.10.1    ; Servidor DNS (este servidor)
+dhcp      IN      A       192.168.10.2    ; Servidor DHCP
+mail      IN      A       192.168.10.3    ; Servidor de e-mail (Postfix/SMTP+POP3)
+www       IN      A       100.127.119.107    ; Servidor Web
+@         IN      A       100.127.119.107    ; netmatrix.com.br tambem aponta para o site
+
+; --- Estacoes dos funcionarios (grupo) ---
+antonio   IN      A       192.168.10.101
+cristino  IN      A       192.168.10.102
+luana     IN      A       192.168.10.103
+maykon    IN      A       192.168.10.104

@@ -1,0 +1,16 @@
+// named.conf.local - zonas locais da empresa NetMatrix
+//
+// Zona direta: traduz nomes do dominio netmatrix.com.br para IPs
+zone "netmatrix.com.br" IN {
+    type master;
+    file "/etc/bind/db.netmatrix.com.br";
+    allow-update { none; };
+};
+
+// Zona reversa: traduz IPs da rede 192.168.10.0/24 para nomes
+// 192.168.10.0/24 -> "10.168.192.in-addr.arpa" (octetos invertidos)
+zone "10.168.192.in-addr.arpa" IN {
+    type master;
+    file "/etc/bind/db.192.168.10";
+    allow-update { none; };
+};
